@@ -7,5 +7,10 @@
     android:id="@+id/autotext"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    />
+    android:singleLine="true"
+    android:focusableInTouchMode="true"
+    android:focusable="true"
+    android:inputType="textAutoCorrect"
+    android:hint="just type..."
+    android:imeOptions="actionSend"/>
 </LinearLayout>
