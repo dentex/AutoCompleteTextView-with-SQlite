@@ -7,6 +7,7 @@ changes:
 
 fixes:
 - DB initialization
+- do not store the same string multiple times
 - suggestions list appearance
 - AndroidManifest
 
