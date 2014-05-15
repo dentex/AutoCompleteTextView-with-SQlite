@@ -1,5 +1,8 @@
 package com.sqlite.autocomplete;
 
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -18,17 +21,21 @@ public class Mainactivity extends Activity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        at=(AutoCompleteTextView)findViewById(R.id.autotext);
+        
         db = new SQLiteAdapter(getBaseContext());
         
+        at = (AutoCompleteTextView)findViewById(R.id.autotext);
         at.setOnEditorActionListener(new OnEditorActionListener(){
 			@Override 
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) { 
 				if(arg1 == EditorInfo.IME_ACTION_SEND) {
-					db.openToWrite();
-					db.insert(at.getText().toString());
-					db.close();
-					updateAdapterFromDB();
+					String s = at.getText().toString();
+		    		if (isSearchNewToDb(s)) {
+						db.openToWrite();
+						db.insert(s);
+						db.close();
+						updateAdapterFromDB();
+		    		}
 					at.setText("");
 				}
 				return false; 
@@ -43,13 +50,24 @@ public class Mainactivity extends Activity
     
 	private void dbInit() {
         db.openToRead();
-        String[] getcontent=db.getAllContents();
+        String[] getcontent = db.getAllContents();
         db.close();
         
         if (getcontent.length == 0) dbPutInitialValues();
         
         updateAdapterFromDB();
 	}
+	
+    private boolean isSearchNewToDb(String searchString) {
+    	db.openToRead();
+        String[] content = db.getAllContents();
+        List<String> contentList = Arrays.asList(content);
+        if (contentList.contains(searchString)) {
+        	return false;
+        } else {
+        	return true;
+        }
+    }
 
 	private void dbPutInitialValues() {
 		String[] icao = {
@@ -90,7 +108,7 @@ public class Mainactivity extends Activity
     
 	private void updateAdapterFromDB() {
         db.openToRead();
-        String[] getcontent=db.getAllContents();
+        String[] getcontent = db.getAllContents();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item, getcontent);
         at.setAdapter(adapter);
         db.close();
